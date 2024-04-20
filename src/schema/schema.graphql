@@ -1,7 +1,11 @@
 type Query {
   getAllCVs: [Cv!]!
   getCVById(id: ID!): Cv
-  getSkillsAndOwnerOfCV(id: ID!): CvSkillsAndOwner
+}
+type Mutation {
+  addCv(input: addCvInput!): ID!
+  updateCv(input: updateCvInput!): ID!
+  deleteCv(id: ID!): ID!
 }
 
 type Cv {
@@ -32,8 +36,22 @@ enum ROLE {
   USER
 }
 
-type CvSkillsAndOwner {
+type Subscription {
+  cvEvent: String!
+}
+
+input addCvInput {
+  name: String!
+  age: Int!
+  job: String!
+  skills: [ID!]!
+  owner: ID!
+}
+
+input updateCvInput {
   id: ID!
-  skills: [Skill!]!
-  owner: User!
+  name: String
+  age: Int
+  job: String
+  skills: [ID!]
 }
