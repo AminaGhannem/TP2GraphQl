@@ -37,3 +37,27 @@ type CvSkillsAndOwner {
   skills: [Skill!]!
   owner: User!
 }
+
+
+input AddCVInput {
+  userId: Int!
+  title: String!
+  document: String!
+  skills: [AddSkillInput!]!
+}
+
+input AddSkillInput {
+  name: String!
+}
+
+input UpdateCVInput {
+  id: Int!
+  title: String
+  document: String
+  skills: [UpdateSkillInput!]
+}
+
+input UpdateSkillInput {
+  id: Int!
+  name: String!
+}
