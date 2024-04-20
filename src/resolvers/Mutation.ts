@@ -1,21 +1,26 @@
 export const Mutation = {
   createCV: async (parent: any, args: any, context: any, info: any) => {
     try {
-      const skillIds = await CheckIfSkillsExist(args.input.skills, context);
-      const userId = await CheckIfUserExists(args.input.ownerId, context);
+      const skillIds = args.input.skills;
+      const userId = args.input.ownerId;
+      const skills = await CheckIfSkillsExist(skillIds, context);
+      const user = await context.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) throw new Error("User does not exist.");
 
       const cv = await context.prisma.cv.create({
         data: {
           name: args.input.name,
           age: args.input.age,
           job: args.input.job,
-          owner: {
-            connect: {
-              id: userId,
-            },
-          },
+          ownerId: userId,
           skills: {
-            connect: skillIds.map((id: any) => ({ id })),
+            createMany: {
+              data: skills.map((skill: any) => ({
+                skillId: skill.id,
+              })),
+            },
           },
         },
       });
@@ -27,29 +32,41 @@ export const Mutation = {
   },
 
   updateCV: async (parent: any, args: any, context: any, info: any) => {
-    const skillIds = await CheckIfSkillsExist(args.input.skillIds, context);
-    return context.prisma.cv.update({
-      where: {
-        id: args.input.id,
-      },
+    const skillIds = args.input.skills;
+    const skills = await CheckIfSkillsExist(skillIds, context);
+
+    const updatedCV = await context.prisma.cv.update({
+      where: { id: args.input.id },
       data: {
         name: args.input.name,
         age: args.input.age,
         job: args.input.job,
         skills: {
-          set: [],
-          connect: skillIds.map((id: any) => ({ id })),
+          createMany: {
+            data: skills.map((skill: any) => ({
+              skillId: skill.id,
+            })),
+          },
         },
       },
     });
+    return updatedCV;
   },
+
   deleteCV: async (parent: any, args: any, context: any, info: any) => {
-    return context.prisma.cv.delete({
-      where: {
-        id: args.input.id,
-      },
-    });
+    try {
+      await context.prisma.cvSkill.deleteMany({
+        where: { cvId: args.id },
+      });
+      return context.prisma.cv.delete({
+        where: { id: args.id },
+      });
+    } catch (error: any) {
+      console.error("Error deleting CV:", error);
+      throw new Error("Failed to delete CV due to an error: " + error.message);
+    }
   },
+
   createSkill: async (parent: any, args: any, context: any, info: any) => {
     return context.prisma.skill.create({
       data: {
@@ -77,35 +94,15 @@ export const Mutation = {
 };
 
 const CheckIfSkillsExist = async (skillIds: any, context: any) => {
-  if (!Array.isArray(skillIds) || skillIds.length === 0) {
-    throw new Error("Skills input is missing or empty.");
-  }
-
-  const existingSkills = await context.prisma.skill.findMany({
+  const skills = await context.prisma.skill.findMany({
     where: {
-      id: {
-        in: skillIds,
-      },
+      id: { in: skillIds },
     },
   });
-  const existingSkillIds = existingSkills.map((skill: any) => skill.id);
-  const allSkillsExist = skillIds.every((id) => existingSkillIds.includes(id));
-
-  if (!allSkillsExist) {
+  if (skills.length !== skillIds.length) {
     throw new Error("One or more skills do not exist.");
   }
-  return existingSkillIds;
+  return skills;
 };
 
 
-const CheckIfUserExists = async (userId: any, context: any) => {
-  const user = await context.prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-  if (!user) {
-    throw new Error("User does not exist.");
-  }
-  return user.id;
-};

@@ -22,8 +22,9 @@ model Cv {
   age   Int 
   job   String
   ownerId String
-  owner  User @relation(fields: [id], references: [id])
+  owner  User @relation(fields: [ownerId], references: [id])
   skills CvSkill[]
+  
 }
 
 model Skill {
