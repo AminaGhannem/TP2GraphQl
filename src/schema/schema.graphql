@@ -1,0 +1,39 @@
+type Query {
+  getAllCVs: [Cv!]!
+  getCVById(id: ID!): Cv
+  getSkillsAndOwnerOfCV(id: ID!): CvSkillsAndOwner
+}
+
+type Cv {
+  id: ID!
+  name: String!
+  age: Int!
+  job: String!
+  skills: [Skill!]!
+  owner: User!
+}
+
+type Skill {
+  id: ID!
+  designation: String!
+  cvs: [Cv!]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  role: ROLE
+  cvs: [Cv!]!
+}
+
+enum ROLE {
+  ADMIN
+  USER
+}
+
+type CvSkillsAndOwner {
+  id: ID!
+  skills: [Skill!]!
+  owner: User!
+}
