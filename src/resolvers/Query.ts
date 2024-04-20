@@ -1,3 +1,21 @@
 export const Query = {
-  hello: () => "Hello GL3 2023 2024 :D",
+  getAllCVs: async (parent: any, args: any, context: any, info: any) => {
+    return context.prisma.cv.findMany({
+      include: {
+        user: true,
+        skills: true,
+      },
+    });
+  },
+  getCVById: async (parent: any, args: any, context: any, info: any) => {
+    return context.prisma.cv.findUnique({
+      where: {
+        id: args.id,
+      },
+      include: {
+        user: true,
+        skills: true,
+      },
+    });
+  },
 };
