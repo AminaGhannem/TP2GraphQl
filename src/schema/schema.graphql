@@ -1,7 +1,6 @@
 type Query {
   getAllCVs: [Cv!]!
   getCVById(id: ID!): Cv
-  getSkillsAndOwnerOfCV(id: ID!): CvSkillsAndOwner
 }
 
 type Cv {
@@ -30,10 +29,4 @@ type User {
 enum ROLE {
   ADMIN
   USER
-}
-
-type CvSkillsAndOwner {
-  id: ID!
-  skills: [Skill!]!
-  owner: User!
 }
