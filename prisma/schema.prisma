@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum  ROLE{
+  ADMIN
+  USER
+}
+
+model User {
+  userId   String   @id @default(cuid())
+  name     String
+  email    String @unique
+  role    ROLE
+  cv       Cv[]
+}
+
+model Cv {
+  CvId    String @id @default(cuid())
+  name  String
+  age   Int 
+  job   String
+  ownerId String
+  owner  User @relation(fields: [ownerId], references: [userId])
+  skills CvSkill[]
+}
+
+model Skill {
+  skillId    String @id @default(cuid())
+  designation  String
+  cv CvSkill[]
+}
+
+model CvSkill {
+  cvId    String
+  skillId String
+  cv      Cv @relation(fields: [cvId], references: [CvId])
+  skill   Skill @relation(fields: [skillId], references: [skillId])
+  @@id([cvId, skillId])
+}  
