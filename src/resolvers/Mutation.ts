@@ -1,24 +1,31 @@
 export const Mutation = {
   createCV: async (parent: any, args: any, context: any, info: any) => {
-    const skillIds = await CheckIfSkillsExist(args.input.skillIds, context);
-    const userId = await CheckIfUserExists(args.input.ownerId, context);
+    try {
+      const skillIds = await CheckIfSkillsExist(args.input.skills, context);
+      const userId = await CheckIfUserExists(args.input.ownerId, context);
 
-    return context.prisma.cv.create({
-      data: {
-        name: args.input.name,
-        age: args.input.age,
-        job: args.input.job,
-        owner: {
-          connect: {
-            id: userId,
+      const cv = await context.prisma.cv.create({
+        data: {
+          name: args.input.name,
+          age: args.input.age,
+          job: args.input.job,
+          owner: {
+            connect: {
+              id: userId,
+            },
+          },
+          skills: {
+            connect: skillIds.map((id: any) => ({ id })),
           },
         },
-        skills: {
-          connect: skillIds.map((id: any) => ({ id })),
-        },
-      },
-    });
+      });
+      return cv;
+    } catch (error: any) {
+      console.error("Error creating CV:", error);
+      throw new Error("Failed to create CV due to an error: " + error.message);
+    }
   },
+
   updateCV: async (parent: any, args: any, context: any, info: any) => {
     const skillIds = await CheckIfSkillsExist(args.input.skillIds, context);
     return context.prisma.cv.update({
@@ -70,6 +77,10 @@ export const Mutation = {
 };
 
 const CheckIfSkillsExist = async (skillIds: any, context: any) => {
+  if (!Array.isArray(skillIds) || skillIds.length === 0) {
+    throw new Error("Skills input is missing or empty.");
+  }
+
   const existingSkills = await context.prisma.skill.findMany({
     where: {
       id: {
@@ -78,15 +89,14 @@ const CheckIfSkillsExist = async (skillIds: any, context: any) => {
     },
   });
   const existingSkillIds = existingSkills.map((skill: any) => skill.id);
-  const allSkillsExist = skillIds.every((id: any) =>
-    existingSkillIds.includes(id)
-  );
+  const allSkillsExist = skillIds.every((id) => existingSkillIds.includes(id));
 
   if (!allSkillsExist) {
     throw new Error("One or more skills do not exist.");
   }
   return existingSkillIds;
 };
+
 
 const CheckIfUserExists = async (userId: any, context: any) => {
   const user = await context.prisma.user.findUnique({
