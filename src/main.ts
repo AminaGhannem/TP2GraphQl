@@ -1,7 +1,8 @@
 import { createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "http";
 import { Query } from "./resolvers/Query";
-import { createContext } from './context'
+import { createContext } from "./context";
+import { Cv } from "./resolvers/CV";
 
 const fs = require("fs");
 const path = require("path");
@@ -15,6 +16,7 @@ function main() {
       ),
       resolvers: {
         Query,
+        Cv,
       },
     }),
     context: createContext,
