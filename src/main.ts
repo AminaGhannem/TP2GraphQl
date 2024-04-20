@@ -1,13 +1,17 @@
-import { createSchema, createYoga } from "graphql-yoga";
+//@ts-nocheck
+
+import { createPubSub, createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "http";
 import { Query } from "./resolvers/Query";
 import { Cv } from "./resolvers/Cv";
+import { Subscription } from "./resolvers/Subscription";
 import { data } from "./Data/database";
 
 const fs = require("fs");
 const path = require("path");
 
 function main() {
+  const pubSub = createPubSub();
   const yoga = createYoga({
     schema: createSchema({
       typeDefs: fs.readFileSync(
@@ -17,10 +21,11 @@ function main() {
       resolvers: {
         Cv,
         Query,
+        Subscription,
       },
     }),
     context() {
-      return data;
+      return { data, pubSub };
     },
   });
   const server = createServer(yoga);

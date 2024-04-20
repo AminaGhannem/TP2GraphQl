@@ -30,3 +30,7 @@ enum ROLE {
   ADMIN
   USER
 }
+
+type Subscription {
+  test: String!
+}
