@@ -22,13 +22,8 @@ type User {
   id: ID!
   name: String!
   email: String!
-  role: ROLE
+  role: String!
   cvs: [Cv!]!
-}
-
-enum ROLE {
-  ADMIN
-  USER
 }
 
 input AddCVInput {
@@ -54,13 +49,14 @@ input createSkill {
 input createUser {
   name: String!
   email: String!
-  role: ROLE
+  role: String!
 }
 
 type Mutation {
   addCV(input: AddCVInput!): Cv
   updateCV(input: UpdateCVInput!): Cv
   deleteCV(id: ID!): Cv
+  createCV(input: AddCVInput!): Cv
   createSkill(input: createSkill!): Skill
   createUser(input: createUser!): User
 }

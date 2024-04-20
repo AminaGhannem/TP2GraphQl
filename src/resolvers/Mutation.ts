@@ -1,12 +1,13 @@
 export const Mutation = {
   createCV: async (parent: any, args: any, context: any, info: any) => {
-    const skillIds = await CheckIfSkillsExist(args.skillIds, context);
-    const userId = await CheckIfUserExists(args.ownerId, context);
+    const skillIds = await CheckIfSkillsExist(args.input.skillIds, context);
+    const userId = await CheckIfUserExists(args.input.ownerId, context);
+
     return context.prisma.cv.create({
       data: {
-        name: args.name,
-        age: args.age,
-        job: args.job,
+        name: args.input.name,
+        age: args.input.age,
+        job: args.input.job,
         owner: {
           connect: {
             id: userId,
@@ -19,15 +20,15 @@ export const Mutation = {
     });
   },
   updateCV: async (parent: any, args: any, context: any, info: any) => {
-    const skillIds = await CheckIfSkillsExist(args.skillIds, context);
+    const skillIds = await CheckIfSkillsExist(args.input.skillIds, context);
     return context.prisma.cv.update({
       where: {
-        id: args.id,
+        id: args.input.id,
       },
       data: {
-        name: args.name,
-        age: args.age,
-        job: args.job,
+        name: args.input.name,
+        age: args.input.age,
+        job: args.input.job,
         skills: {
           set: [],
           connect: skillIds.map((id: any) => ({ id })),
@@ -38,26 +39,33 @@ export const Mutation = {
   deleteCV: async (parent: any, args: any, context: any, info: any) => {
     return context.prisma.cv.delete({
       where: {
-        id: args.id,
+        id: args.input.id,
       },
     });
   },
   createSkill: async (parent: any, args: any, context: any, info: any) => {
     return context.prisma.skill.create({
       data: {
-        designation: args.designation,
+        designation: args.input.designation,
       },
     });
   },
 
   createUser: async (parent: any, args: any, context: any, info: any) => {
-    return context.prisma.user.create({
-      data: {
-        name: args.name,
-        email: args.email,
-        role: args.role,
-      },
-    });
+    try {
+      const newUser = await context.prisma.user.create({
+        data: {
+          name: args.input.name,
+          email: args.input.email,
+          role: args.input.role,
+        },
+      });
+      console.log("New User Created:", newUser);
+      return newUser;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw new Error("Failed to create user due to an error.");
+    }
   },
 };
 

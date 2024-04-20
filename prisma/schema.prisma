@@ -9,7 +9,7 @@ datasource db {
 
 
 model User {
-  userId   String   @id @default(cuid())
+  id   String   @id @default(cuid())
   name     String
   email    String @unique
   role     String
@@ -17,25 +17,25 @@ model User {
 }
 
 model Cv {
-  CvId    String @id @default(cuid())
+  id    String @id @default(cuid())
   name  String
   age   Int 
   job   String
   ownerId String
-  owner  User @relation(fields: [ownerId], references: [userId])
+  owner  User @relation(fields: [id], references: [id])
   skills CvSkill[]
 }
 
 model Skill {
-  skillId    String @id @default(cuid())
+  id    String @id @default(cuid())
   designation  String
   cv CvSkill[]
 }
 
 model CvSkill {
-  cvId    String
+  cvId String
   skillId String
-  cv      Cv @relation(fields: [cvId], references: [CvId])
-  skill   Skill @relation(fields: [skillId], references: [skillId])
+  cv      Cv @relation(fields: [cvId], references: [id])
+  skill   Skill @relation(fields: [skillId], references: [id])
   @@id([cvId, skillId])
 }  
