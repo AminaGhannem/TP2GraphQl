@@ -1,7 +1,7 @@
 import { createSchema, createYoga } from "graphql-yoga";
 import { createServer } from "http";
 import { Query } from "./resolvers/Query";
-import { PrismaClient } from "@prisma/client";
+import { createContext } from './context'
 
 const fs = require("fs");
 const path = require("path");
@@ -17,7 +17,7 @@ function main() {
         Query,
       },
     }),
-    context: PrismaClient,
+    context: createContext,
   });
   const server = createServer(yoga);
   server.listen(4000, () => {
