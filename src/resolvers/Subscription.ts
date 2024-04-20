@@ -1,7 +1,7 @@
 //@ts-nocheck
 export const Subscription = {
-  test: {
-    subscribe: (parent, args, { db, pubSub }) => pubSub.subscribe("test"),
+  cvEvent: {
+    subscribe: (parent, args, { db, pubSub }) => pubSub.subscribe("cvEvent"),
     resolve: (payload) => {
       return payload;
     },

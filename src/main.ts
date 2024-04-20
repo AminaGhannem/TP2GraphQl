@@ -5,6 +5,7 @@ import { createServer } from "http";
 import { Query } from "./resolvers/Query";
 import { Cv } from "./resolvers/Cv";
 import { Subscription } from "./resolvers/Subscription";
+import { Mutation } from "./resolvers/Mutation";
 import { data } from "./Data/database";
 
 const fs = require("fs");
@@ -22,6 +23,7 @@ function main() {
         Cv,
         Query,
         Subscription,
+        Mutation,
       },
     }),
     context() {
